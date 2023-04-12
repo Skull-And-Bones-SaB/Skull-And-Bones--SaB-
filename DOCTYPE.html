@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ChatGPT Interfaccia Utente</title>
+  <style>
+    #chat-container {
+      width: 400px;
+      height: 500px;
+      margin: 0 auto;
+      border: 1px solid #ccc;
+      overflow-y: scroll;
+    }
+    #chat-container p {
+      margin: 10px;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: #f1f1f1;
+      display: inline-block;
+    }
+    #chat-form {
+      margin-top: 10px;
+      text-align: center;
+    }
+    #chat-input {
+      width: 70%;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    #chat-submit {
+      width: 20%;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <p>Benvenuto nella chat di ChatGPT</p>
+  </div>
+  <form id="chat-form">
+    <input type="text" id="chat-input" placeholder="Inserisci la tua domanda">
+    <button type="submit" id="chat-submit">Invia</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@openai/api@0.7.0/dist/index.js"></script>
+  <script>
+    const chatForm = document.querySelector('#chat-form');
+    const chatContainer = document.querySelector('#chat-container');
+    const chatInput = document.querySelector('#chat-input');
+
+    const openai = new OpenAI(process.env.OPENAI_API_KEY);
+
+    chatForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const userInput = chatInput.value.trim();
+      if (userInput === '') {
+        return;
+      }
+      chatInput.value = '';
+      const chatBubble = document.createElement('p');
+      chatBubble.textContent = `Utente: ${userInput}`;
+      chatContainer.appendChild(chatBubble);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      const aiResponse = await openai.complete({
+        engine: 'davinci',
+        prompt: `Interazione utente: ${userInput}\nRisposta: `,
+        maxTokens: 150,
+        n: 1,
+        stop: ['\n'],
+      });
+      const aiText = aiResponse.choices[0].text.trim();
+      const aiBubble = document.createElement('p');
+      aiBubble.textContent = `ChatGPT: ${aiText}`;
+      chatContainer.appendChild(aiBubble);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    });
+  </script>
+</body>
+</html>
